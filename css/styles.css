@@ -325,3 +325,25 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
+@media screen and (min-width: 1024px) {
+  #restaurant-wrapper {
+    max-width: 45vw;
+    margin: 0 auto;
+  }
+  .inside main {
+    flex-direction: row-reverse;
+  }
+  .inside #map-container {
+    top: 130px;
+    position: sticky;
+    height: calc(100vh - 130px);
+  }
+  .inside #map-container, #restaurant-container {
+    flex: 1;
+  }
+  #restaurant-name {
+    background: none;
+    text-align: left;
+    padding-left: 0;
+  }
+}
