@@ -141,6 +141,14 @@ resetRestaurants = (restaurants) => {
   self.restaurants = restaurants;
 }
 
+addGridFillers = (ul) => {
+  for (let i = 0; i < 3; i++) {
+    const li = document.createElement('li');
+    li.className = 'grid-fill';
+    ul.append(li);
+  }
+}
+
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
@@ -149,6 +157,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
+  addGridFillers(ul);
   addMarkersToMap();
 }
 

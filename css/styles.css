@@ -5,6 +5,10 @@ html {
   box-sizing: border-box;
 }
 
+html, body {
+  max-width: 100%;
+}
+
 *, *:before, *:after {
   box-sizing: inherit;
 }
@@ -118,6 +122,11 @@ nav h1 a {
 .filter-options {
   background-color: #3397DB;
   border-bottom: 1px solid #3397DB;
+  margin-bottom: 24px;
+}
+.filter-options-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .filter-options h2 {
   color: #fff;
@@ -138,15 +147,18 @@ nav h1 a {
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
   background-color: #f3f3f3;
-  list-style: outside none none;
+  list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
 }
 #restaurants-list li {
   background-color: #fff;
   border: 2px solid #ccc;
   min-height: 380px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 #restaurants-list .restaurant-img {
   background-color: #ccc;
@@ -182,6 +194,36 @@ nav h1 a {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+#restaurants-list li.grid-fill {
+  height: 0;
+  min-height: 0;
+  visibility: hidden;
+}
+
+@media screen and (min-width: 600px) {
+  #restaurants-list {
+    padding: 0 16px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  #restaurants-list li {
+    width: 49%;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  #restaurants-list li {
+    width: 32%;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  #restaurants-list li {
+    width: 24%;
+  }
 }
 
 /* ====================== Restaurant Details ====================== */
