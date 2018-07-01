@@ -35,11 +35,11 @@ h1, h2, h3, h4, h5, h6 {
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
 	display: block;
 }
-#maincontent {
+main {
   background-color: #f3f3f3;
   min-height: 100%;
 }
-#footer {
+footer {
   background-color: #444;
   color: #aaa;
   font-size: 8pt;
