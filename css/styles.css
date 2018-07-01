@@ -59,6 +59,7 @@ nav {
 }
 nav h1 {
   margin: auto;
+  text-align: center;
 }
 nav h1 a {
   color: #fff;
@@ -107,7 +108,6 @@ nav h1 a {
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
-  
   background-color: #3397DB;
   border-bottom: 1px solid #3397DB;
 }
