@@ -58,6 +58,22 @@
         </div>
         <!-- Beginning reviews -->
         <section id="reviews-container">
+          <form id="review-form" class="review-form" action="#" method="POST">
+            <h4>Submit your review</h4>
+            <label for="username">Your name</label>
+            <input type="text" name="username" id="username" required>
+            <label for="rating">Your rating</label>
+            <select name="rating" id="rating" required>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+            </select>
+            <label for="comments">Your review</label>
+            <textarea name="comments" id="comments" required></textarea>
+            <input type="submit">
+          </form>
           <ul id="reviews-list"></ul>
         </section>
         <!-- End reviews -->

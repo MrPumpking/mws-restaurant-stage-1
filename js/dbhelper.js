@@ -4,10 +4,13 @@
 class DBHelper {
 
   static dbPromise() {
-    return idb.open('db', 1, function(upgradeDb) {
+    return idb.open('db', 2, function(upgradeDb) {
       switch(upgradeDb.oldVersion) {
         case 0:
           upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+        case 1:
+          const reviewsStore = upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+          reviewsStore.createIndex('restaurant', 'restaurant_id');        
       }
     });
   }
@@ -18,7 +21,7 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}/`;
   }
 
   /**
@@ -40,7 +43,7 @@ class DBHelper {
   }
 
   static fetchAndCacheRestaurants() {
-    return fetch(DBHelper.DATABASE_URL)
+    return fetch(DBHelper.DATABASE_URL + 'restaurants')
       .then(response => response.json())
       .then(restaurants => {
         return this.dbPromise()
@@ -51,6 +54,64 @@ class DBHelper {
 
             return tx.complete.then(() => Promise.resolve(restaurants));
           });
+      });
+  }
+
+  /**
+   * Fetch all reviews.
+   */
+  static fetchReviews() {
+    return this.dbPromise()
+      .then(db => {
+        const tx = db.transaction('reviews');
+        const reviewStore = tx.objectStore('reviews');
+        return reviewStore.getAll();
+      })
+      .then(reviews => {
+        if (reviews.length !== 0) {
+          return Promise.resolve(reviews);
+        }
+        return this.fetchAndCacheReviews();
+      })
+  }
+
+  static fetchAndCacheReviews() {
+    return fetch(DBHelper.DATABASE_URL + 'reviews')
+      .then(response => response.json())
+      .then(reviews => {
+        return this.dbPromise()
+          .then(db => {
+            const tx = db.transaction('reviews', 'readwrite');
+            const restaurantStore = tx.objectStore('reviews');
+            reviews.forEach(review => restaurantStore.put(review));
+
+            return tx.complete.then(() => Promise.resolve(reviews));
+          });
+      });
+  }
+
+  static fetchReviewsByRestaurantId(id) {
+    return this.fetchReviews().then(reviews => {
+      return this.dbPromise().then(db => {
+        const tx = db.transaction('reviews');
+        const reviewsStore = tx.objectStore('reviews');
+        const restaurantIndex = reviewsStore.index('restaurant');
+        return restaurantIndex.getAll(id);
+      }).then(restaurantReviews => {
+        const savedReviews = JSON.parse(localStorage.getItem('SAVED_REVIEWS')) || [];
+        const filtered = savedReviews.filter(review => review.restaurant_id === id);
+        return restaurantReviews.concat(filtered);
+      })
+    })
+  }
+
+  static insertReview(review) {
+    this.dbPromise()
+      .then(db => {
+        const tx = db.transaction('reviews', 'readwrite');
+        const reviewsStore = tx.objectStore('reviews');
+        reviewsStore.put(review);
+        return tx.complete;
       });
   }
 
@@ -151,6 +212,27 @@ class DBHelper {
       })
       marker.addTo(newMap);
     return marker;
+  }
+
+  static postSavedReviews () {
+    if (!navigator.onLine) {
+      return;
+    }
+  
+    const savedReviews = JSON.parse(localStorage.getItem('SAVED_REVIEWS')) || [];
+    savedReviews.forEach(review => DBHelper.postAndCacheReview(review));
+    localStorage.removeItem('SAVED_REVIEWS');
+  }
+
+  static postAndCacheReview(payload) {
+    fetch(this.DATABASE_URL + 'reviews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(payload)
+    }).then(response => response.json())
+      .then(review => this.insertReview(review));
   }
 }
 

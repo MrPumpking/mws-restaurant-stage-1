@@ -6,6 +6,9 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
+
+  DBHelper.postSavedReviews();
+  document.querySelector('form#review-form').addEventListener('submit', submitReview);
 });
 
 /**
@@ -104,23 +107,25 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
+fillReviewsHTML = () => {
+  DBHelper.fetchReviewsByRestaurantId(self.restaurant.id).then(reviews => {
+    const container = document.getElementById('reviews-container');
+    const title = document.createElement('h2');
+    title.innerHTML = 'Reviews';
+    container.appendChild(title);
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
-    return;
-  }
-  const ul = document.getElementById('reviews-list');
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
+    if (!reviews) {
+      const noReviews = document.createElement('p');
+      noReviews.innerHTML = 'No reviews yet!';
+      container.appendChild(noReviews);
+      return;
+    }
+    const ul = document.getElementById('reviews-list');
+    reviews.forEach(review => {
+      ul.appendChild(createReviewHTML(review));
+    });
+    container.appendChild(ul);
   });
-  container.appendChild(ul);
 }
 
 /**
@@ -133,7 +138,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt).toLocaleDateString("en-EN");
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -171,4 +176,33 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+submitReview = (event) => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+
+  const payload = {
+    restaurant_id: self.restaurant.id,
+    name: data.get('username'),
+    rating: data.get('rating'),
+    comments: data.get('comments'),
+    createdAt: new Date().toUTCString()
+  };
+
+  event.target.reset();
+
+  const reviewsContainer = document.getElementById('reviews-list');
+  const reviewElement = createReviewHTML(payload);
+  reviewsContainer.appendChild(reviewElement);
+  reviewElement.scrollIntoView({ behavior: 'smooth' });
+
+  if (!navigator.onLine) {
+    const savedReviews = JSON.parse(localStorage.getItem('SAVED_REVIEWS')) || [];
+    savedReviews.push(payload);
+    localStorage.setItem('SAVED_REVIEWS', JSON.stringify(savedReviews));
+    return;
+  }
+
+  DBHelper.postAndCacheReview(payload);
 }
