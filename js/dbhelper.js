@@ -234,5 +234,23 @@ class DBHelper {
     }).then(response => response.json())
       .then(review => this.insertReview(review));
   }
+
+  static updateFavouriteStatus(restaurantId, isFavourite) {
+    fetch(this.DATABASE_URL + `restaurants/${restaurantId}/?is_favorite=${isFavourite}`, {
+      method: 'PUT'
+    })
+    .then(() => {
+      this.dbPromise()
+        .then(db => {
+          const tx = db.transaction('restaurants', 'readwrite');
+          const restaurantsStore = tx.objectStore('restaurants');
+          restaurantsStore.get(restaurantId)
+            .then(restaurant => {
+              restaurant.is_favorite = isFavourite;
+              restaurantsStore.put(restaurant);
+            });          
+        })
+    })
+  }
 }
 

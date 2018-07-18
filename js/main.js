@@ -163,6 +163,13 @@ createRestaurantHTML = (restaurant) => {
   name.innerHTML = restaurant.name;
   description.append(name);
 
+  if (restaurant.is_favorite) {
+    const span = document.createElement('span');
+    span.className = 'favourite-badge';
+    span.innerHTML = 'Your favourite';
+    description.appendChild(span);
+  }
+
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
   description.append(neighborhood);

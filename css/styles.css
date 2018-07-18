@@ -366,3 +366,26 @@ nav h1 a {
   max-width: 100%;
   min-height: 100px;
 }
+
+.favourite-badge {
+  color: #fff;
+  display: inline-block;
+  background-color: #27ae60;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+}
+
+.favourite-button {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  padding: 20px;
+  background-color: #27ae60;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+}
+
+.favourite-button.is-favourite {
+  background-color: #c0392b;
+}

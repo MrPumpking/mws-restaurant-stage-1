@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   DBHelper.postSavedReviews();
   document.querySelector('form#review-form').addEventListener('submit', submitReview);
+  document.querySelector('.favourite-button').addEventListener('click', toggleFavourite);
 });
 
 /**
@@ -75,6 +76,13 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+
+  const favouriteButton = document.querySelector('.favourite-button');
+  
+  if (restaurant.is_favorite) {
+    favouriteButton.classList.add('is-favourite');
+    favouriteButton.innerHTML = 'Remove from favourites';
+  }
 
   // fill operating hours
   if (restaurant.operating_hours) {
@@ -205,4 +213,15 @@ submitReview = (event) => {
   }
 
   DBHelper.postAndCacheReview(payload);
+}
+
+toggleFavourite = () => {
+  const isFavNow = !self.restaurant.is_favorite;
+  self.restaurant.is_favorite = isFavNow;
+
+  const favButton = document.querySelector('.favourite-button');
+  favButton.classList.toggle('is-favourite');
+  favButton.innerHTML = (isFavNow ? 'Remove from favourites' : 'Add to favourites');
+
+  DBHelper.updateFavouriteStatus(self.restaurant.id, isFavNow);
 }
